@@ -34,6 +34,18 @@ def bird_func(x, y):
 def easy_func(x: float, y: float) -> float:
     return x**2 + y**2
 
+def f(x1,x2):
+      sum1=0
+      sum2=0
+      for i in range(1,6):
+          sum1 = sum1 + (i* math.cos(((i+1)*x1) +i))
+          sum2 = sum2 + (i* math.cos(((i+1)*x2) +i))
+      return sum1 * sum2
+
+
+def rosen(x, y):
+    return (1-x)**2 + 100 * (y-x**2)**2
+
 
 def single_crossover(parent_1, parent_2, alfa):
     """
@@ -105,15 +117,18 @@ def crossover(population, alfa):
 
 def mutation(population, mutant_number, sigma):
     """
-    chooses random points to mutate
+    chooses random points to mutate,
+    returns population with muted individuals
     """
     mutants_id = []
 
     for _ in range(mutant_number):
         id = random.randint(0, len(population)-1)
 
+        # checking if we do not mute the same individual two times
         while id in mutants_id:
             id = random.randint(0, mutant_number-1)
+
         new_x = random.gauss(population[id][0], sigma)
         new_y = random.gauss(population[id][1], sigma)
         population[id] = (new_x, new_y)
@@ -122,15 +137,19 @@ def mutation(population, mutant_number, sigma):
     return population
 
 
-
-def succesion(k, population, kids):
+def elite_succesion(k, population, kids, func):
+    """
+    choses k best individuals from population after selection and from children, 
+    then it joins with the children group and cuts k worst individuals
+    returns new generation
+    """
     population_values = []
     for indv in population:
-        population_values.append((indv[0], indv[1], easy_func(indv[0], indv[1])))
+        population_values.append((indv[0], indv[1], func(indv[0], indv[1])))
     
     kids_values = []
     for kid in kids:
-        kids_values.append((kid[0], kid[1], easy_func(kid[0], kid[1])))
+        kids_values.append((kid[0], kid[1], func(kid[0], kid[1])))
     
     population_values.sort(key=lambda x: x[2])
     elite = population_values[:k]
@@ -143,18 +162,20 @@ def succesion(k, population, kids):
 
 
 def algortithm():
-    population = start_population(10, 10, 10)
+    population = start_population(20, -2*math.pi, 2*math.pi)
 
     for _ in range(500):
         print(_)
 
-        tour = tournament_reproduction(2, population, easy_func)
+        tour = tournament_reproduction(2, population, bird_func)
 
         kids = crossover(tour, 0.1)
         kids = mutation(kids, 3, 0.1)
 
-        population = succesion(1, population, kids)
+        population = elite_succesion(1, population, kids, bird_func)
         print(population[0])
+
+
 
 
 algortithm()
