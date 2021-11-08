@@ -1,28 +1,6 @@
-import math
-import argparse
 import numpy as np
-import random 
-
-
-def create_parser():
-    """
-    creates parser with optional arguments
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--iteration", type=int,
-                        help='number of iterations', default=1000)
-    parser.add_argument("-ps", "--population-size", type=int,
-                        help='size of the population', default=20)
-    parser.add_argument("-t", "--tournament", type=float,
-                        help='tournament size', default=2)
-    parser.add_argument("-e", "--elite", type=float,
-                        help='size of the elite', default=1)
-    parser.add_argument("-m", "--mutation-force", type=float,
-                        help='force of the mutation (sigma)', default=0.3)
-    parser.add_argument("-mp", "--mutation-probability", type=float,
-                        help='probability of the mutation', default=0.5)
-    # funkcja celu
-    return parser
+import random
+import matplotlib.pyplot as plt
 
 
 def bird_func(x, y):
@@ -34,22 +12,14 @@ def bird_func(x, y):
 def easy_func(x: float, y: float) -> float:
     return x**2 + y**2
 
-def f(x1,x2):
-      sum1=0
-      sum2=0
-      for i in range(1,6):
-          sum1 = sum1 + (i* math.cos(((i+1)*x1) +i))
-          sum2 = sum2 + (i* math.cos(((i+1)*x2) +i))
-      return sum1 * sum2
 
-
-def rosen(x, y):
+def rosenbrock_func(x, y):
     return (1-x)**2 + 100 * (y-x**2)**2
 
 
 def single_crossover(parent_1, parent_2, alfa):
     """
-    performs a single crossover, 
+    performs a single crossover,
     returns two new points - children of given parents
     """
     child_1 = np.multiply(alfa, parent_1) + np.multiply((1-alfa), parent_2)
@@ -57,7 +27,7 @@ def single_crossover(parent_1, parent_2, alfa):
     return tuple(child_1), tuple(child_2)
 
 
-def start_population(size, min, max):
+def start_population(size, min_x, max_x, min_y, max_y):
     """
     generates random population in given range
     and of given size
@@ -65,7 +35,7 @@ def start_population(size, min, max):
     population = []
 
     for _ in range(size):
-        individual = (random.uniform(min, max), random.uniform(min, max))
+        individual = (random.uniform(min_x, max_x), random.uniform(min_y, max_y))
         population.append(individual)
 
     return population
@@ -84,7 +54,7 @@ def tournament_reproduction(tournament_size, population, func):
         # picking competitors to one round
         competitors = random.choices(population, k=tournament_size)
         # assuming that first one is the winner
-        winner = (competitors[0][0], competitors[0][1]) 
+        winner = (competitors[0][0], competitors[0][1])
 
         # checking who is the real winner
         for competitor in competitors:
@@ -139,21 +109,21 @@ def mutation(population, mutant_number, sigma):
 
 def elite_succesion(k, population, kids, func):
     """
-    choses k best individuals from population after selection and from children, 
+    choses k best individuals from population after selection and from children,
     then it joins with the children group and cuts k worst individuals
     returns new generation
     """
     population_values = []
     for indv in population:
         population_values.append((indv[0], indv[1], func(indv[0], indv[1])))
-    
+
     kids_values = []
     for kid in kids:
         kids_values.append((kid[0], kid[1], func(kid[0], kid[1])))
-    
+
     population_values.sort(key=lambda x: x[2])
     elite = population_values[:k]
-    
+
     next_population = elite + kids_values
     next_population.sort(key=lambda x: x[2])
     next_population = next_population[:-k]
@@ -161,23 +131,66 @@ def elite_succesion(k, population, kids, func):
     return next_population
 
 
-def algortithm():
-    population = start_population(20, -2*math.pi, 2*math.pi)
+if __name__ == "__main__":
+    # creating random population
+    # population size, min_x, max_x, min_y, max_y
+    population = start_population(20, -2, 2, -1, 3)
 
+    # data for the plot
+    first_x = [indv[0] for indv in population]
+    first_y = [indv[1] for indv in population]
+    first_values = [rosenbrock_func(indv[0], indv[1]) for indv in population]
+
+    all_x, all_y, all_values = [], [], []
+
+    # starting evolution!
+    # number of iterations
     for _ in range(500):
         print(_)
 
-        tour = tournament_reproduction(2, population, bird_func)
+        # selection
+        # size of tournament, population, aim func
+        selected_indv = tournament_reproduction(2, population, rosenbrock_func)
 
-        kids = crossover(tour, 0.1)
+        # crossover
+        # selected individuals, alfa
+        kids = crossover(selected_indv, 0.1)
+
+        # mutation
+        # list with individuals, number of indviduals to mutate, sigma
         kids = mutation(kids, 3, 0.1)
 
-        population = elite_succesion(1, population, kids, bird_func)
+        # succesion
+        # size of elite, population, kids, aim func
+        population = elite_succesion(1, population, kids, rosenbrock_func)
+
+        # helps to follow the algorithm
         print(population[0])
 
+        # data for the plot
+        all_x.extend(indv[0] for indv in population)
+        all_y.extend(indv[1] for indv in population)
+        all_values.extend(rosenbrock_func(indv[0], indv[1]) for indv in population)
 
+    # creating a plot
+    x = np.linspace(-2, 2, 100)
+    y = np.linspace(-1, 3, 100)
 
+    x, y = np.meshgrid(x, y)
+    values = rosenbrock_func(x, y)
 
-algortithm()
+    figure = plt.figure()
+    axis = figure.gca(projection='3d')
+    axis.scatter(first_x, first_y, first_values, c='black')
+    axis.scatter(all_x, all_y, all_values, c='black')
+    axis.contour3D(x, y, values)
+    axis.set_title('Rosenbrock function')
+    axis.plot_surface(x, y, values)
 
-
+    axis.view_init(elev=25, azim=42)
+    axis.set_xlabel('x')
+    axis.set_ylabel('y')
+    axis.set_zlabel('z')
+    plt.contour(x, y, values)
+    plt.title("Rosenbrock function")
+    plt.show()
