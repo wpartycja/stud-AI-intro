@@ -1,7 +1,6 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-from matplotlib import cm
 
 
 def bird_func(x, y):
@@ -135,7 +134,7 @@ def elite_succesion(k, population, kids, func):
 if __name__ == "__main__":
     # creating random population
     # population size, min_x, max_x, min_y, max_y
-    population = start_population(20, 1, 2, 1, 2)
+    population = start_population(5, -2, -2, -1, 3)
     func = rosenbrock_func
     # data for the plot
     first_x = [indv[0] for indv in population]
@@ -151,7 +150,7 @@ if __name__ == "__main__":
 
         # selection
         # size of tournament, population, aim func
-        selected_indv = tournament_reproduction(2, population, func)
+        selected_indv = tournament_reproduction(10, population, func)
 
         # crossover
         # selected individuals, alfa
@@ -159,7 +158,7 @@ if __name__ == "__main__":
 
         # mutation
         # list with individuals, number of indviduals to mutate, sigma
-        kids = mutation(kids, 3, 0.1)
+        kids = mutation(kids, 1, 0.1)
 
         # succesion
         # size of elite, population, kids, aim func
@@ -188,7 +187,7 @@ if __name__ == "__main__":
     axis.set_title('Function')
     axis.plot_wireframe(x, y, values, rstride=7, cstride=7, color='black')
 
-    axis.view_init(elev=90, azim=42)
+    axis.view_init(elev=43, azim=42)
     axis.set_xlabel('x')
     axis.set_ylabel('y')
     axis.set_zlabel('z')
