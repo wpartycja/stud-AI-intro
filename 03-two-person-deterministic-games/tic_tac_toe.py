@@ -95,9 +95,13 @@ class TicTacToe():
 
         return max(score) if is_max else min(score)
 
-    def make_best_move_max(self, player, depth, ab):
+    def make_best_move_max(self, player, depth, ab, random):
         best_score = -inf
         best_move = None
+
+        if random:
+            self.random_move(player)
+            return None
 
         for x in range(3):
             for y in range(3):
@@ -113,9 +117,13 @@ class TicTacToe():
 
         self.make_move(best_move, player)
 
-    def make_best_move_min(self, player, depth, ab):
+    def make_best_move_min(self, player, depth, ab, random):
         best_score = inf
         best_move = None
+
+        if random:
+            self.random_move(player)
+            return None
 
         for x in range(3):
             for y in range(3):
