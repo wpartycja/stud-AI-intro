@@ -15,11 +15,11 @@ class TicTacToe():
         if max_player == 'X':
             self.max_player = 'X'
             self.min_player = 'O'
-            self.score = {'X': 1, 'O': -1, 'tie': 0}
+            self.score = {'X': 1, 'O': -1, 'tie': 0, None: 0}
         else:
             self.max_player = 'O'
             self.min_player = 'X'
-            self.score = {'O': 1, 'X': -1, 'tie': 0}
+            self.score = {'O': 1, 'X': -1, 'tie': 0, None: 0}
         self.max_states = 0
         self.min_states = 0
 
@@ -73,15 +73,14 @@ class TicTacToe():
         coord = choice(self.free_spots)
         self.make_move(coord, player)
 
-    def minimax(self, depth, is_max):
-
+    def minimax(self, depth, is_max, max_player):
         # check if someone wins (or there is a tie)
         if depth == 0 or self.check_winner() is not None:
-            if is_max:
+            if max_player:
                 self.max_states += 1
             else:
                 self.min_states += 1
-            return self.score[self.check_winner()]*depth
+            return self.score[self.check_winner()]
 
         player = (self.max_player if is_max else self.min_player)
 
@@ -91,12 +90,12 @@ class TicTacToe():
                 spot = x, y
                 if self.is_free(spot):
                     self.make_move(spot, player)
-                    score.append(self.minimax(depth-1, not is_max))
+                    score.append(self.minimax(depth-1, not is_max, max_player))
                     self.undo_move(spot)
 
         return max(score) if is_max else min(score)
 
-    def make_best_move_max(self, player, depth, ab,):
+    def make_best_move_max(self, player, depth, ab):
         best_score = -inf
         best_move = None
 
@@ -105,14 +104,13 @@ class TicTacToe():
                 spot = x, y
                 if self.is_free(spot):
                     self.make_move(spot, player)
-                    score = self.alfa_beta(depth, False, -inf, inf) if ab else self.minimax(depth, False)
+                    score = self.alfa_beta(depth, False, True, -inf, inf) if ab else self.minimax(depth, False, True)
                     self.undo_move(spot)
 
                     if score > best_score:
                         best_score = score
                         best_move = spot
 
-        print(f'max looked states: {self.max_states}')
         self.make_move(best_move, player)
 
     def make_best_move_min(self, player, depth, ab):
@@ -124,24 +122,23 @@ class TicTacToe():
                 spot = x, y
                 if self.is_free(spot):
                     self.make_move(spot, player)
-                    score = self.alfa_beta(depth, True, -inf, inf) if ab else self.minimax(depth, True)
+                    score = self.alfa_beta(depth, True, False, -inf, inf) if ab else self.minimax(depth, True, False)
                     self.undo_move(spot)
 
                     if score < best_score:
                         best_score = score
                         best_move = spot
 
-        print(f'min looked states: {self.min_states}')
         self.make_move(best_move, player)
 
-    def alfa_beta(self, depth, is_max, alfa, beta):
+    def alfa_beta(self, depth, is_max, max_player, alfa, beta):
         # check if someone wins (or there is a tie)
         if depth == 0 or self.check_winner() is not None:
-            if is_max:
+            if max_player:
                 self.max_states += 1
             else:
                 self.min_states += 1
-            return self.score[self.check_winner()]*depth
+            return self.score[self.check_winner()]
 
         player = (self.max_player if is_max else self.min_player)
 
@@ -153,7 +150,7 @@ class TicTacToe():
                     spot = x, y
                     if self.is_free(spot):
                         self.make_move(spot, player)
-                        score.append(self.alfa_beta(depth-1, not is_max, alfa, beta))
+                        score.append(self.alfa_beta(depth-1, not is_max, max_player, alfa, beta))
                         self.undo_move(spot)
                         value = max(score)
                         if value >= beta:
@@ -167,7 +164,7 @@ class TicTacToe():
                     spot = x, y
                     if self.is_free(spot):
                         self.make_move(spot, player)
-                        score.append(self.alfa_beta(depth-1, not is_max, alfa, beta))
+                        score.append(self.alfa_beta(depth-1, not is_max, max_player, alfa, beta))
                         self.undo_move(spot)
                         value = min(score)
                         if value <= alfa:
