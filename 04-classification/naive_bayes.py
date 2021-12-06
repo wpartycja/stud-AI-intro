@@ -1,21 +1,16 @@
-import re
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from scipy import stats
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-from seaborn import heatmap
-from sklearn.utils.validation import check_memory
 
 
 class NB_Gaussian():
     def __init__(self, training_df, test_df, p_class):
-        self.training_df = training_df  
+        self.training_df = training_df
         self.test_df = test_df
         self.p_class = p_class
         # training df grouped by classes, with calculated means and standard deviation
-        self.aggs = self.training_df.groupby(self.p_class).agg(['mean', 'std']) 
+        self.aggs = self.training_df.groupby(self.p_class).agg(['mean', 'std'])
 
     # P(A|C) - for single example (with distinct feature from distinct group)
     # from gauss formula
@@ -39,7 +34,7 @@ class NB_Gaussian():
         for group in range(min_class, max_class):
             # P(C)
             class_amount = len(self.training_df[self.training_df[self.p_class] == group])
-            
+
             prob = class_amount/len(self.training_df.index)
             for feature in self.training_df.columns:
                 if feature == self.p_class:
@@ -85,8 +80,9 @@ def cross_validation(df, k, p_class):
         gauss_classifier = NB_Gaussian(train_set, test_set, p_class)
         res = gauss_classifier.check_result()
         results.append(res)
-    
+
     return results
+
 
 def count_efficiency(results):
     good = 0
@@ -124,6 +120,3 @@ if __name__ == "__main__":
 
     print(results)
     print(count_efficiency(results))
-    
-
-
