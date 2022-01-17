@@ -1,4 +1,3 @@
-from email.charset import SHORTEST
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -36,7 +35,7 @@ class Qlearning_maze():
             raise ValueError("Goal can't be on a path which is WALL")
         new_maze[goal_x][goal_y] = 'F'
         return np.asarray(new_maze)
-    
+
     def show_maze(self):
         print(self.maze)
 
@@ -118,7 +117,6 @@ class Qlearning_maze():
             all_rewards.append(0)
             path = []
 
-
             # while not self.is_illegal(x, y):
             while self.rewards_table[x][y] != 100:
                 action = self.next_action(x, y)
@@ -171,9 +169,9 @@ class Qlearning_maze():
 
 if __name__ == "__main__":
     # maze_path, goal, learing_rate, discount_factor (beta), episodes
-    qmaze = Qlearning_maze("06-qlearning/maze1.txt", (10, 15), 0.8, 0.85, 50) 
+    qmaze = Qlearning_maze("06-qlearning/maze1.txt", (10, 15), 0.8, 0.85, 50)
 
-    all_rewards, len_paths = qmaze.train((0,0))
+    all_rewards, len_paths = qmaze.train((0, 0))
     shortest_path, maze_with_path = qmaze.show_shortest_path(0, 0)
     print(shortest_path)
     print(maze_with_path)
@@ -184,7 +182,6 @@ if __name__ == "__main__":
     plt.title('Sum of rewards obtained per episode')
     plt.xlabel('Episodes')
     plt.ylabel('Rewars')
-
 
     plt.figure(1)
     plt.plot(len_paths, 'red')
