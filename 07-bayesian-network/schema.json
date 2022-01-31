@@ -1,0 +1,34 @@
+[
+    {
+        "name": "alarm_clock",
+        "dependents": [],
+        "probabilities" : {
+            "": 0.99
+        }
+    },
+    {
+        "name": "oversleep",
+        "dependents": ["alarm_clock"],
+        "probabilities" : {
+            "F": 0.88,
+            "T": 0.19
+        }
+    },
+    {
+        "name": "traffic",
+        "dependents": [],
+        "probabilities" : {
+            "": 0.62
+        }
+    },
+    {
+        "name": "on_time",
+        "dependents": ["oversleep", "traffic"],
+        "probabilities" : {
+            "FF": 0.98,
+            "TF": 0.27,
+            "FT": 0.58,
+            "TT": 0.05
+        }
+    }
+]
