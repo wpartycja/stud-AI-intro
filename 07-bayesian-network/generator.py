@@ -40,7 +40,7 @@ def generate(nodes, samples_nr):
 
 
 if __name__ == "__main__":
-    nodes = load_from_json('/home/wpartycja/3sem/WSI/07-bayes-models/schema.json')
+    nodes = load_from_json('./schema.json')
     repetitions = 10000
     results = generate(nodes, repetitions)
 

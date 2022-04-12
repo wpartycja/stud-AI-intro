@@ -169,7 +169,7 @@ class Qlearning_maze():
 
 if __name__ == "__main__":
     # maze_path, goal, learing_rate, discount_factor (beta), episodes
-    qmaze = Qlearning_maze("06-qlearning/maze1.txt", (10, 15), 0.8, 0.85, 50)
+    qmaze = Qlearning_maze("./maze1.txt", (10, 15), 0.8, 0.85, 50)
 
     all_rewards, len_paths = qmaze.train((0, 0))
     shortest_path, maze_with_path = qmaze.show_shortest_path(0, 0)
